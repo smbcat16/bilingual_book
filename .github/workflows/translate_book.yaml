@@ -30,7 +30,9 @@ jobs:
     strategy:
       matrix:  
         include:
-          - name: the_little_prince.txt
+          - link_folder: https://share.smbcat.workers.dev/2:/books
+          - book_name: the_little_prince
+          - book_type: txt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -53,13 +55,13 @@ jobs:
       - name: Test install
         run: pip install .
       - name: wget
-        run: wget "https://share.smbcat.workers.dev/2:/books/${{ matrix.name }}"
+        run: wget "${{ matrix.link_folder }}/${{ matrix.book_name }}.${{ matrix.book_type }}"
       - name: make txt book test using gemini
-        run: python3 make_book.py --book_name ${{ matrix.name }} --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
+        run: python3 make_book.py --book_name "${{ matrix.book_name }}.${{ matrix.book_type }}" --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
             
       - name: Rename and Upload ePub
         if: env.GEMINI_API_KEY != null
         uses: actions/upload-artifact@v4
         with:
           name: epub_output
-          path: "${{ matrix.name }}_bilingual.txt"
+          path: "${{ matrix.book_name }}_bilingual.${{ matrix.book_type }}"
