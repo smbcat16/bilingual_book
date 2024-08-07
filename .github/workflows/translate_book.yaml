@@ -6,6 +6,7 @@ on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
+      
   
 env:
   ACTIONS_ALLOW_UNSECURE_COMMANDS: true
@@ -31,8 +32,8 @@ jobs:
       matrix:  
         include:
           - link_folder: https://share.smbcat.workers.dev/2:/books
-          - book_name: the_little_prince
-          - book_type: txt
+            book_name: the_little_prince
+            book_type: txt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
