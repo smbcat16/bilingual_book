@@ -30,7 +30,6 @@ jobs:
     strategy:
       matrix:  
         include:
-          - link: https://share.smbcat.workers.dev/2:/books/the_little_prince.txt
           - name: the_little_prince.txt
     runs-on: ubuntu-latest
     steps:
@@ -54,9 +53,7 @@ jobs:
       - name: Test install
         run: pip install .
       - name: wget
-        uses: wei/wget@v1
-        with:
-          args: -O ${{ matrix.name }} ${{ matrix.link }}
+        run: wget "https://share.smbcat.workers.dev/2:/books/${{ matrix.name }}"
       - name: make txt book test using gemini
         run: python3 make_book.py --book_name ${{ matrix.name }} --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
             
