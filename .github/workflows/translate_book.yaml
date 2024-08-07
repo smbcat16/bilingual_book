@@ -55,7 +55,7 @@ jobs:
       - name: Test install
         run: pip install .
       - name: wget
-        run: wget ${{ matrix.link_folder }}/${{ matrix.book_name }}.${{ matrix.book_type }}
+        run: wget "${{ matrix.link_folder }}/${{ matrix.book_name }}.${{ matrix.book_type }}"
       - name: make txt book test using gemini
         run: python3 make_book.py --book_name ${{ matrix.book_name }}.${{ matrix.book_type }} --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
             
