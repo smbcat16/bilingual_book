@@ -23,6 +23,11 @@ jobs:
         with:
           config: ./typos.toml
   testing:
+    strategy:
+      matrix:  
+        include:
+          - link: https://share.smbcat.workers.dev/2:/books/the_little_prince.txt
+          - name: the_little_prince.txt
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,13 +49,16 @@ jobs:
 
       - name: Test install
         run: pip install .
-
+      - name: wget
+        uses: wei/wget@v1
+        with:
+          args: -O ${{ matrix.name }} ${{ matrix.link }}
       - name: make txt book test using gemini
-        run: python3 make_book.py --book_name "test_books/the_little_prince.txt" --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
+        run: python3 make_book.py --book_name ${{ matrix.name }} --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
             
       - name: Rename and Upload ePub
         if: env.GEMINI_API_KEY != null
         uses: actions/upload-artifact@v4
         with:
           name: epub_output
-          path: "test_books/the_little_prince_bilingual.txt"
+          path: "${{ matrix.name }}_bilingual.txt"
