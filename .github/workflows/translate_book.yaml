@@ -1,4 +1,4 @@
-name: CI
+name: Translate book
 
 on:
   push:
@@ -36,31 +36,44 @@ jobs:
             book_type: txt
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - 
+        name: 'Cleanup build folder'
+        run: |
+          ls -la ./
+          rm -rf ./* || true
+          rm -rf ./.??* || true
+          ls -la ./
+      - 
+        name: Checkout github
+        uses: actions/checkout@v4
         with:
           repository: "yihong0618/bilingual_book_maker"
           ref: "main"
           path: "${{ github.workspace }}"
-      - name: install python 3.9 
+      - 
+        name: Install python 3.9 
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
           cache: 'pip' # caching pip dependencies
-      - name: Check formatting (black)
+      - 
+        name: Check formatting (black)
         run: |
             pip install black
             black . --check
-      - name: install python requirements
-        run: pip install -r requirements.txt
-
-      - name: Test install
-        run: pip install .
-      - name: wget
+      - 
+        name: Install python requirements
+        run: |
+            pip install -r requirements.txt
+#            pip install -e .            
+      - 
+        name: Download book
         run: wget "${{ matrix.link_folder }}/${{ matrix.book_name }}.${{ matrix.book_type }}"
-      - name: make txt book test using gemini
-        run: python3 make_book.py --book_name ${{ matrix.book_name }}.${{ matrix.book_type }} --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
-            
-      - name: Rename and Upload ePub
+      - 
+        name: Make txt book test using gemini
+        run: python3 make_book.py --book_name ${{ matrix.book_name }}.${{ matrix.book_type }} --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi        
+      - 
+        name: Rename and Upload ePub
         if: env.GEMINI_API_KEY != null
         uses: actions/upload-artifact@v4
         with:
