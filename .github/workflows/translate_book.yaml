@@ -55,25 +55,21 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.9'
-          cache: 'pip' # caching pip dependencies
+          cache: 'pip'
       - 
-        name: Check formatting (black)
+        name: Check formatting and install requirements
         run: |
             pip install black
-            black . --check
-      - 
-        name: Install python requirements
-        run: |
-            pip install -r requirements.txt
-#            pip install -e .            
+            black . --check        
+            pip install -r requirements.txt           
       - 
         name: Download book
         run: wget "${{ matrix.link_folder }}/${{ matrix.book_name }}.${{ matrix.book_type }}"
       - 
-        name: Make txt book test using gemini
+        name: Translate book
         run: python3 make_book.py --book_name ${{ matrix.book_name }}.${{ matrix.book_type }} --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi        
       - 
-        name: Rename and Upload ePub
+        name: Rename and upload book
         if: env.GEMINI_API_KEY != null
         uses: actions/upload-artifact@v4
         with:
