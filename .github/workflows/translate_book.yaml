@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  
+env:
+  ACTIONS_ALLOW_UNSECURE_COMMANDS: true
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
+jobs:
+  typos-check:
+    name: Spell Check with Typos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Actions Repository
+        uses: actions/checkout@v4
+      - name: Check spelling with custom config file
+        uses: crate-ci/typos@v1.16.6
+        with:
+          config: ./typos.toml
+  testing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: "yihong0618/bilingual_book_maker"
+          ref: "main"
+          path: "${{ github.workspace }}"
+      - name: install python 3.9 
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          cache: 'pip' # caching pip dependencies
+      - name: Check formatting (black)
+        run: |
+            pip install black
+            black . --check
+      - name: install python requirements
+        run: pip install -r requirements.txt
+
+      - name: Test install
+        run: pip install .
+
+      - name: make txt book test using gemini
+        run: python3 make_book.py --book_name "test_books/the_little_prince.txt" --test --model gemini --gemini_key ${{ secrets.GEMINI_API_KEY }}  --language vi
+            
+      - name: Rename and Upload ePub
+        if: env.GEMINI_API_KEY != null
+        uses: actions/upload-artifact@v4
+        with:
+          name: epub_output
+          path: "test_books/the_little_prince_bilingual.txt"
