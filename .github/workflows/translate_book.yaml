@@ -34,7 +34,7 @@ jobs:
           - link_folder: https://share.smbcat.workers.dev/2:/books
             book_name: the_little_prince
             book_type: txt
-    runs-on: ubuntu-latest
+    runs-on: colab
     steps:
       - 
         name: 'Cleanup build folder'
